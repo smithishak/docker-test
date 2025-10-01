@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Профиль</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="profile-container">
+    <h2>Профиль</h2>
+    <div id="profileMessage">Загрузка...</div>
+    <button onclick="logout()">Выйти</button>
+  </div>
+  <script>
+    async function loadProfile() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      const res = await fetch('/profile', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (data.message) {
+        document.getElementById('profileMessage').textContent = data.message;
+      } else {
+        document.getElementById('profileMessage').textContent = data.error || 'Ошибка';
+        if (data.error) setTimeout(() => window.location.href = '/auth.html', 1500);
+      }
+    }
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/auth.html';
+    }
+    loadProfile();
+  </script>
+</body>
+</html>
